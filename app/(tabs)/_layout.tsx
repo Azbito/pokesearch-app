@@ -1,55 +1,64 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable, useColorScheme } from 'react-native';
+import { Tabs } from 'expo-router'
+import { Feather } from '@expo/vector-icons'
+import { useFonts } from 'expo-font'
+import { Login } from 'components/Login'
+import 'expo-dev-client'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { WEB_CLIENT_ID } from '@env'
+import { AuthGoogleContext, AuthGoogleProvider } from 'contexts/authGoogle'
+import { useContext } from 'react'
 
-import Colors from '@/constants/Colors';
+export default function TabRoutesLayout() {
+  GoogleSignin.configure({
+    webClientId: WEB_CLIENT_ID
+  })
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+  // const { isSigned } = useContext(AuthGoogleContext)
+  const isSigned = false
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    'Poppins-Regular': require('../../assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Medium': require('../../assets/fonts/Poppins-Medium.ttf'),
+    'Poppins-Bold': require('../../assets/fonts/Poppins-Bold.ttf')
+  })
+
+  if (!fontsLoaded) {
+    return undefined
+  }
+
+  if (!isSigned) {
+    return <Login />
+  }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-      }}>
+    <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ size, color }) => (
+            <Feather name="user" size={size} color={color} />
+          )
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Home',
+          tabBarIcon: ({ size, color }) => (
+            <Feather name="home" size={size} color={color} />
+          )
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="settings"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Settings',
+          tabBarIcon: ({ size, color }) => (
+            <Feather name="settings" size={size} color={color} />
+          )
         }}
       />
     </Tabs>
-  );
+  )
 }
